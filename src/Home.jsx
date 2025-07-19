@@ -1,6 +1,6 @@
 import { images } from "./assets/data";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom"; // 🔥
+import { useState, useEffect } from "react";
 
 function extractTitle(url) {
   const filename = url.split("/").pop().split("_")[0];
@@ -19,12 +19,19 @@ function extractSlug(url) {
 const QUESTIONS_PER_PAGE = 10;
 
 function Home() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams(); // 🔥
+  const initialPage = parseInt(searchParams.get("page")) || 1; // 🔥
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [inputPage, setInputPage] = useState("");
 
   const totalPages = Math.ceil(images.length / QUESTIONS_PER_PAGE);
   const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
   const currentImages = images.slice(startIndex, startIndex + QUESTIONS_PER_PAGE);
+
+  useEffect(() => {
+    setSearchParams({ page: currentPage }); // 🔥 update URL when page changes
+  }, [currentPage]);
 
   const handlePageJump = () => {
     const pageNum = parseInt(inputPage);
@@ -35,7 +42,7 @@ function Home() {
   };
 
   return (
-    <div style={{ padding: "20px"  }}>
+    <div style={{ padding: "20px" }}>
       <h1>All Questions</h1>
 
       <ol start={startIndex + 1}>
